@@ -57,6 +57,16 @@ const bookSeat = async (req, res) => {
             return res.status(400).json({ message: "User id is required" });
         }
 
+        const userIdExists = await Booking.findOne({ userId })
+        if (userIdExists) {
+            return res.status(400).json({ message: "User already have an booking" });
+        }
+
+        const isBooked = await Booking.findOne({ seatNo });
+        if (isBooked.status === "booked") {
+            return res.status(400).json({ message: "The seat is already booked" });
+        }
+
         if (!startTime || !endTime || !seatNo || !amount) {
             return res.status(400).json({ message: "All fields are required" });
         }
@@ -119,22 +129,22 @@ const getSeatStatus = async (req, res) => {
 }
 cron.schedule("* * * * *", async () => {
     console.log("Cron running")
-  try {
-    const now = new Date();
-    console.log("now", now)
-    const result = await Booking.updateMany(
-      { endTime: { $lt: now }, status: "booked" },
-      { $set: { status: "expired" } }
-    );
-    const get = await Booking.find({status:"booked"})
-    console.log(get)
-    console.log(result)
-    if (result.modifiedCount > 0) {
-      console.log(`${result.modifiedCount} bookings marked as expired at ${now}`);
+    try {
+        const now = new Date();
+        console.log("now", now)
+        const result = await Booking.updateMany(
+            { endTime: { $lt: now }, status: "booked" },
+            { $set: { status: "expired" } }
+        );
+        const get = await Booking.find({ status: "booked" })
+        console.log(get)
+        console.log(result)
+        if (result.modifiedCount > 0) {
+            console.log(`${result.modifiedCount} bookings marked as expired at ${now}`);
+        }
+    } catch (err) {
+        console.error("Cron job error:", err.message);
     }
-  } catch (err) {
-    console.error("Cron job error:", err.message);
-  }
 });
 
 module.exports = { register, login, bookSeat, getActiveBookings, getSeatStatus }
