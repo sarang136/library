@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import api from '../shared/apiClient'
 import { differenceInSeconds } from 'date-fns'
 
 export default function Profile(){
@@ -13,7 +13,7 @@ export default function Profile(){
 
 	const load = async ()=>{
 		try{
-			const { data } = await axios.get('/user/bookings/active', { withCredentials:true })
+			const { data } = await api.get('https://library-1-xu20.onrender.com/user/bookings/active')
 			setBookings(data.bookings || [])
 		}catch(e){
 			setBookings([])

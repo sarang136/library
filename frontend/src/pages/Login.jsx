@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios'
+import api from '../shared/apiClient'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function Login(){
@@ -14,8 +14,10 @@ export default function Login(){
 		setError('')
 		setLoading(true)
 		try{
-			await axios.post('/user/login',{ email,password },{ withCredentials:true })
+			const { data } = await api.post(`https://library-1-xu20.onrender.com/user/login`,{ email,password })
+			if(data?.data?._id){ localStorage.setItem('userId', data.data._id) }
 			navigate('/')
+			
 		}catch(err){
 			setError(err?.response?.data?.message || 'Login failed')
 		}finally{ setLoading(false) }

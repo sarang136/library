@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios'
+import api from '../shared/apiClient'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function Register(){
@@ -14,7 +14,7 @@ export default function Register(){
 		setError('')
 		setLoading(true)
 		try{
-			await axios.post('/user/register',form,{ withCredentials:true })
+			await api.post('https://library-1-xu20.onrender.com/user/register',form)
 			navigate('/login')
 		}catch(err){
 			setError(err?.response?.data?.message || 'Registration failed')
